@@ -14,27 +14,29 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Intake extends SubsystemBase{
 
-    private final CANSparkMax deployer = new CANSparkMax(5, MotorType.kBrushed);
-    private final CANSparkMax intake = new CANSparkMax(0, MotorType.kBrushless);
+    private final CANSparkMax deployer = new CANSparkMax(Constants.Deployer, MotorType.kBrushed);
+    private final CANSparkMax intake = new CANSparkMax(Constants.Intake, MotorType.kBrushless);
 
-    private final Encoder deployerEncoder = new Encoder(0, 1);
+    private final Encoder deployerEncoder = new Encoder(Constants.DeployerEncoder[0], Constants.DeployerEncoder[1]);
 
-    private final DigitalInput intakeSwitch = new DigitalInput(0);
+    //private final DigitalInput intakeLimitSwitch = new DigitalInput(Constants.DeployerLimitSwitch);
 
     
     BooleanSupplier deployState = () -> {
         return false;
     };
     
-    boolean flipIndex = false;
+    boolean flipIntake = false;
+    boolean flipDeployer = false;
 
-    NetworkTableEntry intakeMaxSpeed = Shuffleboard.getTab("TeleOp")
-        .addPersistent("Max Intake Speed", 0.1)
+    NetworkTableEntry intakeSpeed = Shuffleboard.getTab("TeleOp")
+        .addPersistent("Intake Speed", 0)
         .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", 0, "max", 1))
+        .withProperties(Map.of("min", -1, "max", 1))
         .getEntry();
 
     
@@ -44,6 +46,9 @@ public class Intake extends SubsystemBase{
 
     public Intake(){
 
+        intake.setInverted(flipIntake);
+        deployer.setInverted(flipDeployer);
+
         Shuffleboard.getTab("TeleOp")
             .addBoolean("Deploy Status", deployState);
 
@@ -52,20 +57,28 @@ public class Intake extends SubsystemBase{
 
 
     public void enableIntake(){
-        intake.set(intakeMaxSpeed.getDouble(0.1));
+        intake.set(intakeSpeed.getDouble(0));
     }
+
 
     public void stopIntake(){
+        intakeSpeed.setDouble(0);
         intake.set(0);
+        
     }
 
-    public void toggleIntakeStatus(){
+    public void setDeployerSpeed(double speed){
+        deployer.set(speed);
+    }
+
+    public void toggleIntakeDeployState(){
 
         if(deployState.getAsBoolean()){
             deployState = () ->{
                 return false;
             };
 
+            //return intake back to stored position
 
 
 
@@ -77,6 +90,7 @@ public class Intake extends SubsystemBase{
             };
 
 
+            //deploy intake
 
 
         }
@@ -86,7 +100,7 @@ public class Intake extends SubsystemBase{
     }
 
     public void periodic(){
-        
+        //intake.set(intakeSpeed.getDouble(0));
     }
     
 }

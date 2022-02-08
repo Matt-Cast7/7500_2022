@@ -14,12 +14,22 @@ package frc.robot;
  */
 public final class Constants {
     
-    public static final int Motor_Left_Back = 17;//2
-    public static final int Motor_Left_Front = 18;//1
-    public static final int Motor_Right_Back = 3;//13
-    public static final int Motor_Right_Front = 4;//12
+    public static final int Motor_Left_Back = 3;//2
+    public static final int Motor_Left_Front = 4;//1
+    public static final int Motor_Right_Back = 5;//13
+    public static final int Motor_Right_Front = 6;//12
 
-    public static final int testMotor = 14;
+    public static final int Deployer = 7;
+    public static final int Intake = 8;
+
+    public static final int[] DeployerEncoder = {0, 1};
+    public static final int DeployerLimitSwitch = 0;
+
+    public static final int[] Indexer = {9, 10};
+
+    public static final int[] Shooter = {11, 12};
+
+    //public static final int testMotor = 14;
 
     
     public static final double ControllerDeadzone = 0.05;

@@ -19,18 +19,20 @@ import frc.robot.commands.TestMotorBackward;
 import frc.robot.commands.OpenIntake;
 import frc.robot.commands.TestMotorForward;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.ShooterTest;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SparkMaxMotor;
 
 public class RobotContainer {
 
   DriveTrain m_DriveTrain;
-  ShooterTest shooter;
 
   SparkMaxMotor m_motor;
 
   Intake m_intake;
+  Index m_index;
+  Shooter m_shooter;
 
 
   Command m_TankDrive;
@@ -73,11 +75,11 @@ public class RobotContainer {
 
     m_DriveTrain = new DriveTrain();
 
-    m_motor = new SparkMaxMotor();
-
-    shooter = new ShooterTest();
+    //m_motor = new SparkMaxMotor();
 
     m_intake = new Intake();
+    m_index = new Index();
+    m_shooter = new Shooter();
     
 
     configureButtons();
