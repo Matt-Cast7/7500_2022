@@ -68,7 +68,9 @@ public class Robot extends TimedRobot {
 
   
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_robotContainer.updater.update();
+  }
 
   @Override
   public void testInit() {
@@ -77,7 +79,6 @@ public class Robot extends TimedRobot {
 
     // arcadeDrive = m_robotContainer.getArcadeDrive();
     // arcadeDrive.schedule();
-    m_robotContainer.testMotor();
   }
 
   

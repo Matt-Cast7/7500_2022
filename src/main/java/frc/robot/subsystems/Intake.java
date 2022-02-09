@@ -23,15 +23,13 @@ public class Intake extends SubsystemBase{
 
     private final Encoder deployerEncoder = new Encoder(Constants.DeployerEncoder[0], Constants.DeployerEncoder[1]);
 
-    //private final DigitalInput intakeLimitSwitch = new DigitalInput(Constants.DeployerLimitSwitch);
+    private  DigitalInput intakeLimitSwitch = new DigitalInput(Constants.DeployerLimitSwitch);
 
     
-    BooleanSupplier deployState = () -> {
-        return false;
-    };
+    private BooleanSupplier deployState;
     
-    boolean flipIntake = false;
-    boolean flipDeployer = false;
+    private boolean flipIntake = false;
+    private boolean flipDeployer = false;
 
     NetworkTableEntry intakeSpeed = Shuffleboard.getTab("TeleOp")
         .addPersistent("Intake Speed", 0)
@@ -51,6 +49,8 @@ public class Intake extends SubsystemBase{
 
         Shuffleboard.getTab("TeleOp")
             .addBoolean("Deploy Status", deployState);
+
+        deployState = () -> intakeLimitSwitch.get();
 
     }
 
@@ -74,9 +74,7 @@ public class Intake extends SubsystemBase{
     public void toggleIntakeDeployState(){
 
         if(deployState.getAsBoolean()){
-            deployState = () ->{
-                return false;
-            };
+            
 
             //return intake back to stored position
 
@@ -85,9 +83,7 @@ public class Intake extends SubsystemBase{
 
 
         }else{
-            deployState = () ->{
-                return true;
-            };
+            
 
 
             //deploy intake
@@ -100,7 +96,14 @@ public class Intake extends SubsystemBase{
     }
 
     public void periodic(){
-        //intake.set(intakeSpeed.getDouble(0));
+        
     }
+
+    public void update(){
+        intake.set(intakeSpeed.getDouble(0));
+
+    }
+
+    
     
 }

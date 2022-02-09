@@ -34,6 +34,8 @@ public class RobotContainer {
   Index m_index;
   Shooter m_shooter;
 
+  SystemsUpdater updater;
+
 
   Command m_TankDrive;
   Command m_ArcadeDrive;
@@ -81,7 +83,7 @@ public class RobotContainer {
     m_index = new Index();
     m_shooter = new Shooter();
     
-
+    updater = new SystemsUpdater(m_index, m_intake, m_shooter, m_DriveTrain);
     configureButtons();
   }
 
