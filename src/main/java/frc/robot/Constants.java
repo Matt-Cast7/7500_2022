@@ -34,6 +34,10 @@ public final class Constants {
     
     public static final double ControllerDeadzone = 0.05;
 
+    public static final double shooterGearing = 32.0/30.0;
+
+    
+
 
 
 }

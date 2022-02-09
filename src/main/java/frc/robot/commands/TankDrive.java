@@ -17,6 +17,7 @@ public class TankDrive extends CommandBase{
         this.m_DriveTrain = m_DriveTrain;
         this.m_leftPower = m_leftPower;
         this.m_rightPower = m_rightPower;
+        addRequirements(m_DriveTrain);
     }
 
     @Override
