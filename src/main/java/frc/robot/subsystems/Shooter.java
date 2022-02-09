@@ -41,7 +41,6 @@ public class Shooter extends SubsystemBase{
 
     @Override
     public void periodic(){
-        //shooterMaster.set(shooterSpeed.getDouble(0));
         
     }
 
@@ -50,6 +49,10 @@ public class Shooter extends SubsystemBase{
     public void setShooterSpeed(double speed){
         shooterSpeed.setDouble(speed);
         shooterMaster.set(speed);
+    }
+
+    public void update(){
+        shooterMaster.set(shooterSpeed.getDouble(0));
     }
     
 }
