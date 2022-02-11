@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.Map;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -36,6 +37,9 @@ public class Index extends SubsystemBase{
         leftMotor.setInverted(!flipIndexMotors);
         rightMotor.setInverted(flipIndexMotors);
 
+        leftMotor.setIdleMode(IdleMode.kBrake);
+        rightMotor.setIdleMode(IdleMode.kBrake);
+
 
     }
 
@@ -48,13 +52,32 @@ public class Index extends SubsystemBase{
     public void setRightMotor(double speed){
         rightMotorSpeed.setDouble(speed);
         rightMotor.set(speed);
-
     }
+
+    public void setIndex(double speed){
+        leftMotorSpeed.setDouble(speed);
+        rightMotorSpeed.setDouble(speed);
+
+        rightMotor.set(speed);
+        leftMotor.set(speed);
+    }
+
+    public void stop(){
+        leftMotorSpeed.setDouble(0);
+        rightMotorSpeed.setDouble(0);
+
+        rightMotor.set(0);
+        leftMotor.set(0);
+    }
+
 
     @Override
     public void periodic(){
 
-        //leftMotor.set(leftMotorSpeed.getDouble(0));
-        //rightMotor.set(rightMotorSpeed.getDouble(0));
+    }
+
+    public void update(){
+        leftMotor.set(leftMotorSpeed.getDouble(0));
+        rightMotor.set(rightMotorSpeed.getDouble(0));
     }
 }

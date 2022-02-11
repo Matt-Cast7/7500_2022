@@ -31,7 +31,9 @@ public class DriveTrain extends SubsystemBase{
         rightMaster.setInverted(rFlip);
 
         leftMaster.setIdleMode(IdleMode.kCoast);
+        leftSlave.setIdleMode(IdleMode.kCoast);
         rightMaster.setIdleMode(IdleMode.kCoast);
+        rightSlave.setIdleMode(IdleMode.kCoast);
     }
 
 

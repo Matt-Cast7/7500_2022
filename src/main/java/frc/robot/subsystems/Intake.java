@@ -4,11 +4,16 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -19,17 +24,25 @@ import frc.robot.Constants;
 public class Intake extends SubsystemBase{
 
     private final CANSparkMax deployer = new CANSparkMax(Constants.Deployer, MotorType.kBrushed);
+    
     private final CANSparkMax intake = new CANSparkMax(Constants.Intake, MotorType.kBrushless);
 
-    private final Encoder deployerEncoder = new Encoder(Constants.DeployerEncoder[0], Constants.DeployerEncoder[1]);
+    private final Encoder encoder = new Encoder(Constants.DeployerEncoder[0], Constants.DeployerEncoder[1], false);
 
     private  DigitalInput intakeLimitSwitch = new DigitalInput(Constants.DeployerLimitSwitch);
 
+    private ArmFeedforward feedforward = new ArmFeedforward(0.2*12, 0, 0, 0);
     
     private BooleanSupplier deployState;
     
     private boolean flipIntake = false;
     private boolean flipDeployer = false;
+
+    private double intakeAngle;
+
+    private double retractedAngle = 140;
+    private double deployedAngle = 87;
+
 
     NetworkTableEntry intakeSpeed = Shuffleboard.getTab("TeleOp")
         .addPersistent("Intake Speed", 0)
@@ -47,10 +60,18 @@ public class Intake extends SubsystemBase{
         intake.setInverted(flipIntake);
         deployer.setInverted(flipDeployer);
 
+        deployer.setIdleMode(IdleMode.kCoast);
+
         Shuffleboard.getTab("TeleOp")
             .addBoolean("Deploy Status", deployState);
 
         deployState = () -> intakeLimitSwitch.get();
+
+        
+
+        intakeAngle = (deployState.getAsBoolean()) ? deployedAngle : retractedAngle;
+
+        encoder.reset();
 
     }
 
@@ -60,6 +81,10 @@ public class Intake extends SubsystemBase{
         intake.set(intakeSpeed.getDouble(0));
     }
 
+    public void setIntake(double speed){
+        intakeSpeed.setDouble(speed);
+        intake.set(speed);
+    }
 
     public void stopIntake(){
         intakeSpeed.setDouble(0);
@@ -77,17 +102,17 @@ public class Intake extends SubsystemBase{
             
 
             //return intake back to stored position
-
-
-
-
+            while(intakeAngle < retractedAngle){
+                setDeployerSpeed(feedforward.calculate(intakeAngle, 1, 1));
+            }
+            
 
         }else{
             
-
-
+            while(intakeAngle > deployedAngle){
+                setDeployerSpeed(feedforward.calculate(intakeAngle, -1, 1));
+            }
             //deploy intake
-
 
         }
 
@@ -96,11 +121,13 @@ public class Intake extends SubsystemBase{
     }
 
     public void periodic(){
+        intakeAngle += (encoder.get()*0.0439);//scale the encoding values somehow to make it equal to angle
         
+
     }
 
     public void update(){
-        intake.set(intakeSpeed.getDouble(0));
+        intake.setVoltage(MathUtil.clamp(intakeSpeed.getDouble(0), 0, 12));
 
     }
 
