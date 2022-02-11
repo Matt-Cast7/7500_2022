@@ -17,6 +17,7 @@ import frc.robot.commands.CloseIntake;
 import frc.robot.commands.TankDrive;
 import frc.robot.commands.TestMotorBackward;
 import frc.robot.commands.OpenIntake;
+import frc.robot.commands.RunShooter;
 import frc.robot.commands.TestMotorForward;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Index;
@@ -40,14 +41,15 @@ public class RobotContainer {
   Command m_TankDrive;
   Command m_ArcadeDrive;
 
-  Command testShooter;
-
   Command testMotorForward;
   Command testMotorBackward;
 
 
   Command openIntake;
   Command closeIntake;
+
+
+  Command runShooter;
 
  
   Joystick m_leftJoystick;
@@ -75,12 +77,12 @@ public class RobotContainer {
     buttonBox = new Joystick(2);
     
 
-    m_DriveTrain = new DriveTrain();
+    //m_DriveTrain = new DriveTrain();
 
     //m_motor = new SparkMaxMotor();
 
-    m_intake = new Intake();
-    m_index = new Index();
+    //m_intake = new Intake();
+    //m_index = new Index();
     m_shooter = new Shooter();
     
     updater = new SystemsUpdater(m_index, m_intake, m_shooter, m_DriveTrain);
@@ -99,6 +101,11 @@ public class RobotContainer {
     Rtrigger = new JoystickButton(m_rightJoystick, 1);
 
 
+  }
+
+  public void runShooter(){
+    runShooter = new RunShooter(m_shooter);
+    green.toggleWhenPressed(runShooter);
   }
 
 

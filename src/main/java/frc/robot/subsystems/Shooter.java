@@ -27,8 +27,9 @@ public class Shooter extends SubsystemBase{
 
 
 
-    boolean flipShooter = false;
+    private boolean flipShooter = false;
 
+    
     public Shooter(){
         
         shooterMaster.setInverted(flipShooter);
@@ -48,8 +49,7 @@ public class Shooter extends SubsystemBase{
     }
 
     public void enable(){
-        shooterSpeed.setDouble(0.1);
-        shooterMaster.set(0.1);
+        shooterMaster.set(shooterSpeed.getDouble(0));
     }
 
     public void stop(){

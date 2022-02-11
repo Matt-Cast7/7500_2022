@@ -64,6 +64,8 @@ public class Robot extends TimedRobot {
     //tankDrive.schedule();
 
    // m_robotContainer.testIntake();
+
+   m_robotContainer.runShooter();
   }
 
   

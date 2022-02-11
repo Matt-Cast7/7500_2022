@@ -11,8 +11,21 @@ public class RunShooter extends CommandBase{
         this.m_shooter = m_shooter;
     }
 
+    public void initialize(){
+        m_shooter.setShooterSpeed(0.1);
+    }
+
     public void execute(){
-        
+        m_shooter.enable();
+    }
+
+
+    public boolean isFinished(){
+        return false;
+    }
+
+    public void end(boolean interrupted){
+        m_shooter.setShooterSpeed(0);
     }
     
 }
