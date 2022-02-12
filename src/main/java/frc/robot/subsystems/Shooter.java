@@ -1,19 +1,12 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.BangBangController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,6 +28,12 @@ public class Shooter extends SubsystemBase{
 
 
     private boolean flipShooter = false;
+
+    // private NetworkTableEntry targetRpm = Shuffleboard.getTab("TeleOp")
+    //         .addPersistent("Target Shooter Wheel RPM", 0)
+    //         .withWidget(BuiltInWidgets.kNumberSlider)
+    //         .withProperties(Map.of("min", 0, "max", 100))
+    //         .getEntry();
 
     private NetworkTableEntry wheelSpeed = Shuffleboard.getTab("TeleOp")
             .addPersistent("Shooter Wheel RPM", 0)

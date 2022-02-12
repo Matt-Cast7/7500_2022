@@ -36,6 +36,13 @@ public final class Constants {
 
     public static final double shooterGearing = 32.0/30.0;
 
+    public static final double indexGearing = 1;
+    public static final double indexWheel = 1;
+
+
+
+    public static final double currentLimit = 180;
+
     
 
 

@@ -34,6 +34,8 @@ public class DriveTrain extends SubsystemBase{
         leftSlave.setIdleMode(IdleMode.kCoast);
         rightMaster.setIdleMode(IdleMode.kCoast);
         rightSlave.setIdleMode(IdleMode.kCoast);
+
+        
     }
 
 
