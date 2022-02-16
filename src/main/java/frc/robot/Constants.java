@@ -19,8 +19,8 @@ public final class Constants {
     public static final int Motor_Right_Back = 5;//13
     public static final int Motor_Right_Front = 6;//12
 
-    public static final int Deployer = 7;
-    public static final int Intake = 8;
+    public static final int Deployer = 12;
+    public static final int Intake = 11;
 
     public static final int[] DeployerEncoder = {0, 1};
     public static final int DeployerLimitSwitch = 0;
@@ -38,6 +38,8 @@ public final class Constants {
 
     public static final double indexGearing = 1;
     public static final double indexWheel = 1;
+    
+    public static final double deployerGearing = 1.0/100.0 * 21.0/36.0;
 
 
 

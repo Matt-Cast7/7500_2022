@@ -8,20 +8,23 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.RetractIntake;
+import frc.robot.commands.RunDeployer;
+import frc.robot.commands.RunIntake;
 import frc.robot.commands.TankDrive;
-import frc.robot.commands.TestMotorBackward;
+
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.RunShooter;
-import frc.robot.commands.TestMotorForward;
+
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.SparkMaxMotor;
+
 
 public class RobotContainer {
 
@@ -30,8 +33,6 @@ public class RobotContainer {
   private Intake m_intake;
   private Index m_index;
   private Shooter m_shooter;
-
-  private SparkMaxMotor m_motor;
 
 
   
@@ -44,9 +45,10 @@ public class RobotContainer {
   private Command retractIntake;
   private Command runIntake;
   private Command runShooter;
+
+  private Command runDeployer;
+  private Command runintake;
   
-  private Command testMotorForward;
-  private Command testMotorBackward;
 
   private PowerDistribution pd;
 
@@ -71,6 +73,10 @@ public class RobotContainer {
   public RobotContainer() {
 
     pd = new PowerDistribution();
+
+    Shuffleboard.getTab("TeleOp").addNumber("Total Current", () -> pd.getTotalCurrent());
+    Shuffleboard.getTab("TeleOp").addNumber("PDH Temp", () -> pd.getTemperature());  
+
     
     
     m_leftJoystick = new Joystick(0);
@@ -80,7 +86,7 @@ public class RobotContainer {
 
     //m_DriveTrain = new DriveTrain();
 
-    //m_intake = new Intake();
+    m_intake = new Intake();
     //m_index = new Index();
     //m_shooter = new Shooter();
 
@@ -106,9 +112,18 @@ public class RobotContainer {
 
   public void runShooter(){
     runShooter = new RunShooter(m_shooter);
-    green.toggleWhenPressed(runShooter);
+    toggle.whileHeld(runShooter);
   }
 
+  public void runDeployer(){
+    runDeployer = new RunDeployer(m_intake);
+    toggle.whileHeld(runDeployer);
+  }
+
+  public void runIntake(){
+    runIntake = new RunIntake(m_intake);
+    toggle.whileHeld(runIntake);
+  }
 
 
   public Command getTankDrive(){
@@ -130,16 +145,6 @@ public class RobotContainer {
 
 
 
-
-
-  public void testMotor(){
-    testMotorForward = new TestMotorForward(m_motor);
-    testMotorBackward = new TestMotorBackward(m_motor);
-
-    toggle.and(green).whileActiveContinuous(testMotorForward);
-    toggle.negate().and(green).whileActiveContinuous(testMotorBackward);
-
-  }
 
 
 

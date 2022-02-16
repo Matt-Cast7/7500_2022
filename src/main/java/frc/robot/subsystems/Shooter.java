@@ -18,6 +18,8 @@ public class Shooter extends SubsystemBase{
     private final CANSparkMax shooterMaster = new CANSparkMax(Constants.Shooter[0], MotorType.kBrushless);
     private final CANSparkMax shooterSlave = new CANSparkMax(Constants.Shooter[1], MotorType.kBrushless);
 
+    
+
 
     private NetworkTableEntry shooterSpeed = Shuffleboard.getTab("TeleOp")
         .addPersistent("Shooter Speed", 0)
@@ -27,7 +29,7 @@ public class Shooter extends SubsystemBase{
 
 
 
-    private boolean flipShooter = false;
+    private boolean flipShooter = true;
 
     // private NetworkTableEntry targetRpm = Shuffleboard.getTab("TeleOp")
     //         .addPersistent("Target Shooter Wheel RPM", 0)
@@ -36,24 +38,24 @@ public class Shooter extends SubsystemBase{
     //         .getEntry();
 
     private NetworkTableEntry wheelSpeed = Shuffleboard.getTab("TeleOp")
-            .addPersistent("Shooter Wheel RPM", 0)
+            .add("Shooter Wheel RPM", 0)
             .withWidget(BuiltInWidgets.kDial)
             .getEntry();
 
 
-    private double targetSpeed = 1;
+    private double targetSpeed = 2900;
 
 
     
     public Shooter(){
         
         shooterMaster.setInverted(flipShooter);
-        shooterSlave.setInverted(flipShooter);
+        shooterSlave.setInverted(!flipShooter);
 
         shooterMaster.setIdleMode(IdleMode.kCoast);
         shooterSlave.setIdleMode(IdleMode.kCoast);
         
-        shooterMaster.follow(shooterSlave, true);
+        //shooterMaster.follow(shooterSlave, true);
 
         shooterMaster.getEncoder().setVelocityConversionFactor(Constants.shooterGearing);
 
@@ -73,10 +75,13 @@ public class Shooter extends SubsystemBase{
 
     public void enable(){
         shooterMaster.set(shooterSpeed.getDouble(0));
+        shooterSlave.set(shooterSpeed.getDouble(0));
+
     }
 
     public void stop(){
         shooterMaster.set(0);
+        shooterSlave.set(0);
     }
 
 
@@ -84,10 +89,13 @@ public class Shooter extends SubsystemBase{
     public void setShooterSpeed(double speed){
         shooterSpeed.setDouble(speed);
         shooterMaster.set(speed);
+        shooterSlave.set(speed);
     }
 
     public void update(){
         shooterMaster.set(shooterSpeed.getDouble(0));
+        shooterSlave.set(shooterSpeed.getDouble(0));
+
     }
 
     public boolean isShooterUptoSpeed(){

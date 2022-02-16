@@ -1,2 +1,3 @@
 [NetworkTables Storage 3.0]
+double "/Shuffleboard/TeleOp/Intake Speed"=0
 double "/Shuffleboard/TeleOp/Max Intake Speed"=1

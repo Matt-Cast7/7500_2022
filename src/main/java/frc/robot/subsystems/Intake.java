@@ -23,10 +23,10 @@ public class Intake extends SubsystemBase {
 
     private final CANSparkMax intake = new CANSparkMax(Constants.Intake, MotorType.kBrushless);
 
-    private final Encoder encoder = new Encoder(Constants.DeployerEncoder[0], Constants.DeployerEncoder[1], false);
-
-    private DigitalInput intakeLimitSwitch = new DigitalInput(Constants.DeployerLimitSwitch);
-
+    //private final Encoder encoder = new Encoder(Constants.DeployerEncoder[0], Constants.DeployerEncoder[1], false);
+    //private final Encoder encoder;
+    //private DigitalInput intakeLimitSwitch = new DigitalInput(Constants.DeployerLimitSwitch);
+    private DigitalInput intakeLimitSwitch;
     private ArmFeedforward feedforward = new ArmFeedforward(0.2 * 12, 0, 0, 0);
 
     private BooleanSupplier deployState;
@@ -45,6 +45,12 @@ public class Intake extends SubsystemBase {
             .withProperties(Map.of("min", -1, "max", 1))
             .getEntry();
 
+            NetworkTableEntry deployerSpeed = Shuffleboard.getTab("TeleOp")
+            .addPersistent("Dployer Speed", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", -1, "max", 1))
+            .getEntry();
+
     public Intake() {
 
         intake.setInverted(flipIntake);
@@ -52,14 +58,15 @@ public class Intake extends SubsystemBase {
 
         deployer.setIdleMode(IdleMode.kCoast);
 
-        Shuffleboard.getTab("TeleOp")
-                .addBoolean("Deploy Status", deployState);
+//        deployState = () -> intakeLimitSwitch.get();
 
-        deployState = () -> intakeLimitSwitch.get();
+        // Shuffleboard.getTab("TeleOp")
+        //         .addBoolean("Deploy Status", deployState);
 
-        intakeAngle = (deployState.getAsBoolean()) ? deployedAngle : retractedAngle;
 
-        encoder.reset();
+        //intakeAngle = (deployState.getAsBoolean()) ? deployedAngle : retractedAngle;
+
+        //encoder.reset();
 
     }
 
@@ -74,11 +81,13 @@ public class Intake extends SubsystemBase {
 
     public void stopIntake() {
         intakeSpeed.setDouble(0);
-        intake.set(0);
+        setIntake(0);
 
     }
 
     public void setDeployerSpeed(double speed) {
+        deployerSpeed.getDouble(speed);
+
         deployer.set(speed);
     }
 
@@ -99,15 +108,22 @@ public class Intake extends SubsystemBase {
         }
     }
 
+    public void enableDeployer(){
+        
+        deployer.set(deployerSpeed.getDouble(0));
+    }
+
 
 
     public void periodic() {
-        intakeAngle += (encoder.get() * 0.0439);// scale the encoding values somehow to make it equal to angle
+        //intakeAngle += (encoder.get() * 0.0439);// scale the encoding values somehow to make it equal to angle
 
     }
 
     public void update() {
-        intake.setVoltage(MathUtil.clamp(intakeSpeed.getDouble(0), 0, 12));
+        //intake.setVoltage(MathUtil.clamp(intakeSpeed.getDouble(0), 0, 12));
+        deployer.set(deployerSpeed.getDouble(0));
+        intake.set(intakeSpeed.getDouble(0));
 
     }
 

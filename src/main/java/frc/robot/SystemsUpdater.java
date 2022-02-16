@@ -24,8 +24,8 @@ public class SystemsUpdater {
 
     public void update(){
         //index.update();
-        //intake.update();
-        shooter.update();
+        intake.update();
+       // shooter.update();
     }
     
     
