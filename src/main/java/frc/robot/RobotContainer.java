@@ -48,7 +48,7 @@ public class RobotContainer {
   private Command runShooter;
 
   private Command runDeployer;
-  private Command runintake;
+  
   
 
   private PowerDistribution pd;
@@ -79,10 +79,6 @@ public class RobotContainer {
   public RobotContainer() {
 
     pd = new PowerDistribution();
-
-    Shuffleboard.getTab("TeleOp").addNumber("Total Current", () -> pd.getTotalCurrent());
-    Shuffleboard.getTab("TeleOp").addNumber("PDH Temp", () -> pd.getTemperature());  
-
     
     
     m_leftJoystick = new Joystick(0);
@@ -151,6 +147,20 @@ public class RobotContainer {
   }
 
 
+  public void testTeleOp(){
+
+    m_TankDrive = new TankDrive(m_DriveTrain,
+    () -> getLeftYAdjusted(),
+    () -> getRightYAdjusted());
+
+    runIntake = new RunIntake(m_intake);
+    runShooter = new RunShooter(m_shooter);
+
+    
+
+    
+
+  }
 
 
 
