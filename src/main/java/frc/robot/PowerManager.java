@@ -42,7 +42,6 @@ public class PowerManager {
                 balancedMode();
             case kBrownBot:
                 brownMode();
-
         }
     
     }

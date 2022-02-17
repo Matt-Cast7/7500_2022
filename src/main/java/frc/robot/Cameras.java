@@ -7,10 +7,12 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.networktables.NetworkTableEntry;
 
-public class Camera {
+public class Cameras {
 
     private UsbCamera camera;
+    private UsbCamera frontCamera;
 
     private CvSink cvSink;
     private CvSource outputStream;
@@ -21,6 +23,8 @@ public class Camera {
     private Thread cameraThread;
 
     private boolean runThread;
+
+    private NetworkTableEntry cameraSelection;
 
     public void init() {
 
