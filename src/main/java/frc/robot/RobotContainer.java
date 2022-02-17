@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Joystick.ButtonType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -62,6 +63,11 @@ public class RobotContainer {
   private JoystickButton Ltrigger;
   private JoystickButton Rtrigger;
 
+  private JoystickButton leftHat;
+  private JoystickButton rightHat;
+  private JoystickButton topHat;
+  private JoystickButton bottomHat;
+
   private JoystickButton toggle;
   private JoystickButton green;
   private JoystickButton red;
@@ -80,6 +86,7 @@ public class RobotContainer {
     
     
     m_leftJoystick = new Joystick(0);
+    
     m_rightJoystick = new Joystick(1);
     buttonBox = new Joystick(2);
     

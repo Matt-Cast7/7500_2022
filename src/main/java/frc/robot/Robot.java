@@ -16,15 +16,11 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private Camera camera;
-
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
 
-    camera.init();
-    camera.start();
     
   }
 
