@@ -26,13 +26,15 @@ public class Cameras {
 
     private NetworkTableEntry cameraSelection;
 
+    private int grey = Imgproc.COLOR_BGR2GRAY;
+
     public void init() {
 
         camera = CameraServer.startAutomaticCapture();
         camera.setResolution(640, 480);
 
         cvSink = CameraServer.getVideo();
-        outputStream = CameraServer.putVideo("Front Camera", 640, 480);
+        outputStream = CameraServer.putVideo("Front Camera", 240, 135);
 
         source = new Mat();
         output = new Mat();

@@ -23,7 +23,7 @@ public class TankDrive extends CommandBase{
     @Override
     public void execute(){
         m_DriveTrain.set(m_leftPower.getAsDouble(), m_rightPower.getAsDouble());
-        System.out.println(m_leftPower.getAsDouble() + " " + m_rightPower.getAsDouble());
+        
     }
 
     @Override

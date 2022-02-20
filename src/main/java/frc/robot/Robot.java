@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,12 +19,16 @@ public class Robot extends TimedRobot {
   private Command arcadeDrive;
 
   private RobotContainer m_robotContainer;
-
+  //CANSparkMax motor = new CANSparkMax(6, MotorType.kBrushless);
+  //Joystick leftJoy = new Joystick(0);
+  Cameras camera = new Cameras();
 
   @Override
   public void robotInit() {
-    m_robotContainer = new RobotContainer();
+   m_robotContainer = new RobotContainer();
 
+   camera.init();
+   camera.start();
     
   }
 
@@ -66,19 +74,24 @@ public class Robot extends TimedRobot {
 
    // m_robotContainer.testIntake();
 
-   m_robotContainer.runDeployer();
+   //m_robotContainer.runDeployer();
+
+  m_robotContainer.testTeleOp();
   }
 
   
   @Override
   public void teleopPeriodic() {
-    m_robotContainer.updater.update();
+   // m_robotContainer.updater.update();
+   //motor.set(leftJoy.getY());
   }
 
   @Override
   public void testInit() {
     
     CommandScheduler.getInstance().cancelAll();
+
+    m_robotContainer.testTeleOp();
 
     // arcadeDrive = m_robotContainer.getArcadeDrive();
     // arcadeDrive.schedule();

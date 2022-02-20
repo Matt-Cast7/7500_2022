@@ -87,16 +87,11 @@ public class Shooter extends SubsystemBase{
 
 
     public void setShooterSpeed(double speed){
-        shooterSpeed.setDouble(speed);
+        
         shooterMaster.set(speed);
         shooterSlave.set(speed);
     }
 
-    public void update(){
-        shooterMaster.set(shooterSpeed.getDouble(0));
-        shooterSlave.set(shooterSpeed.getDouble(0));
-
-    }
 
     public boolean isShooterUptoSpeed(){
         if(wheelSpeed.getDouble(0) < targetSpeed){

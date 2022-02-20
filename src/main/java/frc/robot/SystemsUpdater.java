@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.List;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Index;
@@ -23,9 +24,12 @@ public class SystemsUpdater {
     }
 
     public void update(){
-        //index.update();
-        intake.update();
-       // shooter.update();
+        if(DriverStation.isTest()){
+            // index.update();
+            // intake.update();
+            // shooter.update();
+        }
+        
     }
     
     

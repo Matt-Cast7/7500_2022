@@ -15,12 +15,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.RetractIntake;
 import frc.robot.commands.RunDeployer;
+import frc.robot.commands.RunIndex;
 import frc.robot.commands.RunIntake;
 import frc.robot.commands.TankDrive;
 
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.RunShooter;
-
+import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake;
@@ -34,6 +35,7 @@ public class RobotContainer {
   private Intake m_intake;
   private Index m_index;
   private Shooter m_shooter;
+  private Deployer m_deployer;
 
 
   
@@ -44,6 +46,8 @@ public class RobotContainer {
 
   private Command deployIntake;
   private Command retractIntake;
+
+  public Command runIndex;
   private Command runIntake;
   private Command runShooter;
 
@@ -87,12 +91,12 @@ public class RobotContainer {
     buttonBox = new Joystick(2);
     
 
-    //m_DriveTrain = new DriveTrain();
+    m_DriveTrain = new DriveTrain();
 
     m_intake = new Intake();
-    //m_index = new Index();
-    //m_shooter = new Shooter();
-
+    m_index = new Index();
+    m_shooter = new Shooter();
+    m_deployer = new Deployer();
     //m_motor = new SparkMaxMotor();
 
     updater = new SystemsUpdater(m_index, m_intake, m_shooter, m_DriveTrain);
@@ -119,7 +123,7 @@ public class RobotContainer {
   }
 
   public void runDeployer(){
-    runDeployer = new RunDeployer(m_intake);
+    runDeployer = new RunDeployer(m_deployer);
     toggle.whileHeld(runDeployer);
   }
 
@@ -154,7 +158,19 @@ public class RobotContainer {
     () -> getRightYAdjusted());
 
     runIntake = new RunIntake(m_intake);
+    runDeployer = new RunDeployer(m_deployer);
+    
+    runIndex = new RunIndex(m_index);
     runShooter = new RunShooter(m_shooter);
+
+    toggle.whenHeld(runShooter);
+    green.toggleWhenPressed(runIntake);
+    black.whenHeld(runDeployer);
+    red.toggleWhenPressed(runIndex);
+
+    
+    m_TankDrive.schedule();
+
 
     
 

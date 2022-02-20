@@ -4,10 +4,15 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,28 +23,26 @@ public class Index extends SubsystemBase {
     private final CANSparkMax leftMotor = new CANSparkMax(Constants.Indexer[0], MotorType.kBrushless);
     private final CANSparkMax rightMotor = new CANSparkMax(Constants.Indexer[1], MotorType.kBrushless);
 
-    private BooleanSupplier position1 = () -> {
-        return false;
-    };
+    private final I2C.Port i2c;// = I2C.Port.kOnboard;
 
-    private BooleanSupplier position2 = () -> {
-        return false;
-    };
+    private final ColorSensorV3 colorSensor;// = new ColorSensorV3(i2c);
 
-    private BooleanSupplier position3 = () -> {
-        return false;
-    };
+    private final AnalogInput ultraSonic = new AnalogInput(Constants.uSensor);
 
-    boolean flipIndexMotors = false;
+    private final DigitalInput shooterEntry = new DigitalInput(Constants.ShooterLimitSwitch);
+    
 
-    NetworkTableEntry leftMotorSpeed = Shuffleboard.getTab("TeleOp")
-            .addPersistent("Left Index Speed", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", -1, "max", 1))
-            .getEntry();
 
-    NetworkTableEntry rightMotorSpeed = Shuffleboard.getTab("TeleOp")
-            .addPersistent("Right Index Speed", 0)
+    private BooleanSupplier isIntaking;
+
+    private BooleanSupplier endIndex;
+
+    private boolean flipIndexMotors = false;
+
+    private int uDistance = 1000;
+
+    NetworkTableEntry indexSpeed = Shuffleboard.getTab("TeleOp")
+            .addPersistent("Index Speed", 0)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", -1, "max", 1))
             .getEntry();
@@ -52,96 +55,95 @@ public class Index extends SubsystemBase {
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
 
-        Shuffleboard.getTab("TeleOp").addBoolean("Index Full", () -> isFull());
+
+        i2c = I2C.Port.kOnboard;
+        colorSensor = new ColorSensorV3(i2c);
+
+        isIntaking = () -> {
+            if(colorSensor.getProximity() > uDistance){
+                return true;
+            }else{
+                return false;
+            }
+        };
+
+        endIndex = () ->{
+            if(ultraSonic.getValue() > uDistance){
+                return true;
+            }else{
+                return false;
+            }
+        };
+
+        
+
+        
 
     }
 
-    public void setLeftMotor(double speed) {
-        leftMotorSpeed.setDouble(speed);
-        leftMotor.set(speed);
+    // public void setLeftMotor(double speed) {
+    //     indexSpeed.setDouble(speed);
+    //     leftMotor.set(speed);
 
-    }
+    // }
 
-    public void setRightMotor(double speed) {
-        rightMotorSpeed.setDouble(speed);
-        rightMotor.set(speed);
-    }
+    // public void setRightMotor(double speed) {
+    //     indexSpeed.setDouble(speed);
+    //     rightMotor.set(speed);
+    // }
 
-    public void setIndex(double speed) {
-        leftMotorSpeed.setDouble(speed);
-        rightMotorSpeed.setDouble(speed);
-
+    public void setIndex(double speed) {        
         rightMotor.set(speed);
         leftMotor.set(speed);
     }
 
     public void stop() {
-        leftMotorSpeed.setDouble(0);
-        rightMotorSpeed.setDouble(0);
-
         rightMotor.set(0);
         leftMotor.set(0);
     }
 
-    public boolean isFull() {
-        return (position1.getAsBoolean() && position2.getAsBoolean()) ? true : false;
+    public void enableIndex(){
+        setIndex(indexSpeed.getDouble(0));
     }
+    
 
-    public boolean isEmpty() {
-        return (!position1.getAsBoolean() && !position2.getAsBoolean()) ? true : false;
-    }
-
-    public void intakingBall() {
-        if (isFull()) {
-            if (isEmpty()) {
-                setIndex(0.1);
-                
-                while (!position1.getAsBoolean()) {}
-                
-                stop();
-
-            } else if (position1.getAsBoolean()) {
-                
-                setIndex(0.1);
-
-                while (!position2.getAsBoolean()) {}
-
-                stop();
+    public void indexBall(){
+        if(getDistanceCentimeters() < 40){
+            while(isIntaking.getAsBoolean()){
+                setIndex(0.10);
             }
+            stop();
+        }else{
+            while(getDistanceCentimeters() > 40){
+                setIndex(0.1);
+            }
+            stop();
         }
+    }
+
+    public void initFiring(){
+        while(getDistanceCentimeters() < 45){
+            setIndex(0.1);
+        }
+        stop();
     }
 
     public void fireBall(){
-        if(isEmpty()){
-            if(isFull()){
-                setIndex(0.1);
+        setIndex(0.5);
 
-                while(position2.getAsBoolean()){}
-
-                while(!position2.getAsBoolean()){}
-
-                stop();
-            }else{
-                setIndex(0.1);
-
-                while(!position2.getAsBoolean()){}
-
-                while(position2.getAsBoolean()){}
-
-                while(!position3.getAsBoolean()){}
-
-                stop();
-            }
-        }
+        
     }
+
+    public double getDistanceCentimeters(){
+        return (ultraSonic.getValue() * 0.00125)*100;
+    }
+
+    
 
     @Override
     public void periodic() {
 
     }
 
-    public void update() {
-        leftMotor.set(leftMotorSpeed.getDouble(0));
-        rightMotor.set(rightMotorSpeed.getDouble(0));
-    }
+    
 }

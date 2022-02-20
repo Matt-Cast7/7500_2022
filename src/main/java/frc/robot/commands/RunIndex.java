@@ -12,7 +12,15 @@ public class RunIndex extends CommandBase{
     }
 
     public void execute(){
-        
+        m_index.enableIndex();
+    }
+
+    public boolean isFinished(){
+        return false;
+    }
+
+    public void end(boolean interrupted){
+        m_index.stop();
     }
     
 }

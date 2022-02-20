@@ -24,11 +24,11 @@ public class DriveTrain extends SubsystemBase{
     
 
     public DriveTrain(){
-        leftSlave.follow(leftMaster);
-        rightSlave.follow(rightMaster);
 
         leftMaster.setInverted(lFlip);
+        leftSlave.setInverted(lFlip);
         rightMaster.setInverted(rFlip);
+        rightSlave.setInverted(rFlip);
 
         leftMaster.setIdleMode(IdleMode.kCoast);
         leftSlave.setIdleMode(IdleMode.kCoast);
@@ -46,12 +46,16 @@ public class DriveTrain extends SubsystemBase{
 
     public void set(double speed){
         leftMaster.set(speed);
+        leftSlave.set(speed);
         rightMaster.set(speed);
+        rightSlave.set(speed);
     }
 
     public void set(double lSpeed, double rSpeed){
         leftMaster.set(lSpeed);
+        leftSlave.set(lSpeed);
         rightMaster.set(rSpeed);
+        rightSlave.set(rSpeed);
     }
 
 }

@@ -10,6 +10,7 @@ public class RunIntake extends CommandBase{
 
     public RunIntake(Intake m_intake){
         this.m_intake = m_intake;
+        addRequirements(m_intake);
     }
 
     @Override
