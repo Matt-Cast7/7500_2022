@@ -22,7 +22,7 @@ public class RetractIntake extends CommandBase{
     }
 
     public boolean isFinished(){
-        return false;
+        return true;
     }
     
 }

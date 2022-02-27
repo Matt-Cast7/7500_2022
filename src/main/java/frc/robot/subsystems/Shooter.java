@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -21,11 +22,13 @@ public class Shooter extends SubsystemBase{
     
 
 
-    private NetworkTableEntry shooterSpeed = Shuffleboard.getTab("TeleOp")
-        .addPersistent("Shooter Speed", 0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", -1, "max", 1))
-        .getEntry();
+    // private NetworkTableEntry shooterSpeed = Shuffleboard.getTab("TeleOp")
+    //     .addPersistent("Shooter Speed", 0)
+    //     .withWidget(BuiltInWidgets.kNumberSlider)
+    //     .withProperties(Map.of("min", -1, "max", 1))
+    //     .getEntry();
+
+    private PIDController pid = new PIDController(0, 0, 0);
 
 
 
@@ -42,9 +45,14 @@ public class Shooter extends SubsystemBase{
             .withWidget(BuiltInWidgets.kDial)
             .getEntry();
 
+    
 
-    private double targetSpeed = 2900;
 
+    private double targetSpeed = 4100;
+
+    private static double shooterSpeed = 0.75;
+
+    private static boolean targetGoal = true; 
 
     
     public Shooter(){
@@ -62,6 +70,11 @@ public class Shooter extends SubsystemBase{
         Shuffleboard.getTab("TeleOp")
             .addBoolean("Shooter Ready to Fire", () -> isShooterUptoSpeed());
 
+        
+
+        Shuffleboard.getTab("TeleOp")
+            .addBoolean("High or Low Goal", () -> getTargetGoal());
+
 
     }
 
@@ -74,9 +87,13 @@ public class Shooter extends SubsystemBase{
     }
 
     public void enable(){
-        shooterMaster.set(shooterSpeed.getDouble(0));
-        shooterSlave.set(shooterSpeed.getDouble(0));
+        // shooterMaster.set(shooterSpeed.getDouble(0));
+        // shooterSlave.set(shooterSpeed.getDouble(0));
 
+        shooterMaster.set(shooterSpeed);
+        shooterSlave.set(shooterSpeed);
+
+        
     }
 
     public void stop(){
@@ -99,6 +116,24 @@ public class Shooter extends SubsystemBase{
         }else{
             return true;
         }
+    }
+
+    public void setHighGoal(){
+        shooterSpeed = 0.67;
+        targetGoal = true;
+    }
+
+    public void setLowGoal(){
+        shooterSpeed = 0.45;
+        targetGoal = false;
+    }
+
+    public boolean getTargetGoal(){
+        return targetGoal;
+    }
+
+    public void runBackwards(){
+        setShooterSpeed(0.1);
     }
     
 }

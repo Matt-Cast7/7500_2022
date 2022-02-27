@@ -6,11 +6,9 @@ import frc.robot.subsystems.Shooter;
 
 public class FireBall extends CommandBase{
 
-    private Shooter m_shooter;
     private Index m_index;
 
-    public FireBall(Shooter m_shooter, Index m_index){
-        this.m_shooter = m_shooter;
+    public FireBall(Index m_index){
         this.m_index = m_index;
 
     }
@@ -18,6 +16,18 @@ public class FireBall extends CommandBase{
 
     public void initialize(){
         
+    }
+
+    public void execute(){
+        m_index.setIndex(0.5);
+    }
+
+    public boolean isFinished(){
+        return false;
+    }
+
+    public void end(boolean interrupted){
+        m_index.stop();
     }
     
 }

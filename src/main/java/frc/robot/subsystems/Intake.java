@@ -28,11 +28,11 @@ public class Intake extends SubsystemBase {
     private boolean flipIntake = false;
 
 
-    NetworkTableEntry intakeSpeed = Shuffleboard.getTab("TeleOp")
-            .addPersistent("Intake Speed", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", -1, "max", 1))
-            .getEntry();
+    // NetworkTableEntry intakeSpeed = Shuffleboard.getTab("TeleOp")
+    //         .addPersistent("Intake Speed", 0)
+    //         .withWidget(BuiltInWidgets.kNumberSlider)
+    //         .withProperties(Map.of("min", -1, "max", 1))
+    //         .getEntry();
 
             
 
@@ -47,7 +47,8 @@ public class Intake extends SubsystemBase {
 
     public void enableIntake() {
         //intake.set(intakeSpeed.getDouble(0));
-        intake.set(intakeSpeed.getDouble(0));
+        //intake.set(intakeSpeed.getDouble(0));
+        intake.set(0.4);
     }
 
     public void setIntake(double speed) {

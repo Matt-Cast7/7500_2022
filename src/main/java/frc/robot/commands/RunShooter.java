@@ -12,7 +12,9 @@ public class RunShooter extends CommandBase{
     }
 
     public void initialize(){
-        m_shooter.setShooterSpeed(0.1);
+        
+        
+        //m_shooter.setShooterSpeed(0.1);
     }
 
     public void execute(){

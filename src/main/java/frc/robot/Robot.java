@@ -5,10 +5,16 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,12 +29,14 @@ public class Robot extends TimedRobot {
   //Joystick leftJoy = new Joystick(0);
   Cameras camera = new Cameras();
 
+
   @Override
   public void robotInit() {
    m_robotContainer = new RobotContainer();
 
    camera.init();
    camera.start();
+   
     
   }
 
@@ -36,8 +44,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    
-    
 
     CommandScheduler.getInstance().run();
   }
@@ -55,6 +61,8 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
 
     Shuffleboard.selectTab("Auto");
+    CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.autoCommand().schedule();
 
 
   }
@@ -91,7 +99,7 @@ public class Robot extends TimedRobot {
     
     CommandScheduler.getInstance().cancelAll();
 
-    m_robotContainer.testTeleOp();
+    //m_robotContainer.testTeleOp();
 
     // arcadeDrive = m_robotContainer.getArcadeDrive();
     // arcadeDrive.schedule();

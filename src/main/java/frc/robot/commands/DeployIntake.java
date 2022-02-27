@@ -24,7 +24,7 @@ public class DeployIntake extends CommandBase{
     }
 
     public boolean isFinished(){
-        return false;
+        return true;
     }
     
 }

@@ -10,8 +10,10 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -27,11 +29,9 @@ public class Index extends SubsystemBase {
 
     private final ColorSensorV3 colorSensor;// = new ColorSensorV3(i2c);
 
-    private final AnalogInput ultraSonic = new AnalogInput(Constants.uSensor);
+    private final AnalogPotentiometer ultraSonic = new AnalogPotentiometer(Constants.uSensor);
 
     private final DigitalInput shooterEntry = new DigitalInput(Constants.ShooterLimitSwitch);
-    
-
 
     private BooleanSupplier isIntaking;
 
@@ -41,11 +41,11 @@ public class Index extends SubsystemBase {
 
     private int uDistance = 1000;
 
-    NetworkTableEntry indexSpeed = Shuffleboard.getTab("TeleOp")
-            .addPersistent("Index Speed", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", -1, "max", 1))
-            .getEntry();
+    // NetworkTableEntry indexSpeed = Shuffleboard.getTab("TeleOp")
+    // .addPersistent("Index Speed", 0)
+    // .withWidget(BuiltInWidgets.kNumberSlider)
+    // .withProperties(Map.of("min", -1, "max", 1))
+    // .getEntry();
 
     public Index() {
 
@@ -55,44 +55,42 @@ public class Index extends SubsystemBase {
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
 
-
         i2c = I2C.Port.kOnboard;
         colorSensor = new ColorSensorV3(i2c);
 
         isIntaking = () -> {
-            if(colorSensor.getProximity() > uDistance){
+            if (colorSensor.getProximity() > uDistance) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         };
 
-        endIndex = () ->{
-            if(ultraSonic.getValue() > uDistance){
+        endIndex = () -> {
+            if (ultraSonic.get() > uDistance) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         };
 
-        
-
-        
+        Shuffleboard.getTab("TeleOp")
+                .addBoolean("Index On", () -> indexOn());
 
     }
 
     // public void setLeftMotor(double speed) {
-    //     indexSpeed.setDouble(speed);
-    //     leftMotor.set(speed);
+    // indexSpeed.setDouble(speed);
+    // leftMotor.set(speed);
 
     // }
 
     // public void setRightMotor(double speed) {
-    //     indexSpeed.setDouble(speed);
-    //     rightMotor.set(speed);
+    // indexSpeed.setDouble(speed);
+    // rightMotor.set(speed);
     // }
 
-    public void setIndex(double speed) {        
+    public void setIndex(double speed) {
         rightMotor.set(speed);
         leftMotor.set(speed);
     }
@@ -102,48 +100,76 @@ public class Index extends SubsystemBase {
         leftMotor.set(0);
     }
 
-    public void enableIndex(){
-        setIndex(indexSpeed.getDouble(0));
+    public void enableIndex() {
+        // setIndex(indexSpeed.getDouble(0));
+        setIndex(0.25);
     }
-    
 
-    public void indexBall(){
-        if(getDistanceCentimeters() < 40){
-            while(isIntaking.getAsBoolean()){
+    public boolean indexOn() {
+        if (leftMotor.get() != 0) {
+            return true;
+        } else
+            return false;
+    }
+
+    public void indexBall() {
+        if (getDistanceCentimeters() < 40) {
+            while (isIntaking.getAsBoolean()) {
                 setIndex(0.10);
             }
             stop();
-        }else{
-            while(getDistanceCentimeters() > 40){
+        } else {
+            while (getDistanceCentimeters() > 40) {
                 setIndex(0.1);
             }
             stop();
         }
     }
 
-    public void initFiring(){
-        while(getDistanceCentimeters() < 45){
-            setIndex(0.1);
+    public void initFiring() {
+
+        Timer timer = new Timer();
+        timer.start();
+        while (timer.get() < 0.25) {
+            setIndex(-0.15);
         }
+
+        timer.stop();
+        timer = null;
         stop();
+
     }
 
-    public void fireBall(){
-        setIndex(0.5);
+    public void fireBall() {
 
-        
+        Timer timer = new Timer();
+        timer.start();
+        while (timer.get() < 2) {
+            //setIndex(0.5);
+        }
+        while (timer.get() < 3) {
+            setIndex(0.5);
+        }
+
+        timer.stop();
+        timer = null;
+        stop();
+
     }
 
-    public double getDistanceCentimeters(){
-        return (ultraSonic.getValue() * 0.00125)*100;
+    public void runBackwards(){
+        setIndex(-0.25);
     }
 
-    
+    public double getDistanceCentimeters() {
+        return (ultraSonic.get());// * 0.00125)*100;
+    }
 
     @Override
     public void periodic() {
-
+        // System.out.println(((double)(((int)(getDistanceCentimeters()*10000))))/10000);
+        // System.out.println(colorSensor.getProximity());
+        // System.out.println(colorSensor.getGreen());
     }
 
-    
 }

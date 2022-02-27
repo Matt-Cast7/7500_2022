@@ -36,7 +36,7 @@ public final class Constants {
     public static final int ShooterLimitSwitch = 9;
 
     
-    public static final double ControllerDeadzone = 0.05;
+    public static final double ControllerDeadzone = 0.1;
 
     public static final double shooterGearing = 32.0/30.0;
 
@@ -49,6 +49,14 @@ public final class Constants {
     public static final int uSensor = 0;
 
     public static final double currentLimit = 180;
+
+    public static final double wheelRadius = 3.0;
+
+    public static final double gearRatio = 10.71;
+
+    public static final double a1 = 31;
+    public static final double h1 = 23.625;
+    public static final double h2 = 104;
 
     
 

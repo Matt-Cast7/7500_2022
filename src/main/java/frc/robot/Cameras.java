@@ -31,7 +31,7 @@ public class Cameras {
     public void init() {
 
         camera = CameraServer.startAutomaticCapture();
-        camera.setResolution(640, 480);
+        camera.setResolution(240, 135);
 
         cvSink = CameraServer.getVideo();
         outputStream = CameraServer.putVideo("Front Camera", 240, 135);

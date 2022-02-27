@@ -15,8 +15,23 @@ public class PrimeShooter extends CommandBase{
 
     }
     public void initialize(){
-        m_index.initFiring();
+        //m_index.initFiring();
     }
+
+    
+    public void execute(){
+        m_shooter.enable();
+    }
+
+
+    public boolean isFinished(){
+        return false;
+    }
+
+    public void end(boolean interrupted){
+        m_shooter.setShooterSpeed(0);
+    }
+    
 
     
     

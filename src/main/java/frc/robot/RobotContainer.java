@@ -11,15 +11,25 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Joystick.ButtonType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArcadeDrive;
+import frc.robot.commands.AutoShootBall;
 import frc.robot.commands.RetractIntake;
 import frc.robot.commands.RunDeployer;
 import frc.robot.commands.RunIndex;
+import frc.robot.commands.RunIndexBackwards;
 import frc.robot.commands.RunIntake;
 import frc.robot.commands.TankDrive;
 
 import frc.robot.commands.DeployIntake;
+import frc.robot.commands.FireBall;
+import frc.robot.commands.HighGoal;
+import frc.robot.commands.InitIndexing;
+import frc.robot.commands.LowGoal;
+import frc.robot.commands.MoveFromTarmac;
+import frc.robot.commands.PrimeShooter;
 import frc.robot.commands.RunShooter;
 import frc.robot.subsystems.Deployer;
 import frc.robot.subsystems.DriveTrain;
@@ -52,6 +62,20 @@ public class RobotContainer {
   private Command runShooter;
 
   private Command runDeployer;
+
+  private Command primeShooter;
+
+  private Command fireBall;
+
+  private Command initIndexing;
+
+  public Command autoShootBall;
+  public Command moveFromTarmac;
+
+  public Command runIndexBackwards;
+
+  public Command highGoal;
+  public Command lowGoal;
   
   
 
@@ -82,6 +106,7 @@ public class RobotContainer {
   
   public RobotContainer() {
 
+    TrackDistance t = new TrackDistance();
     pd = new PowerDistribution();
     
     
@@ -144,33 +169,58 @@ public class RobotContainer {
   public Command getArcadeDrive(){
     m_ArcadeDrive = new ArcadeDrive(m_DriveTrain, 
     () -> getLeftYAdjusted(), 
-    () -> getRightX());
+    () -> getRightXAdjusted());
     return m_ArcadeDrive;
 
+
+  }
+
+  public SequentialCommandGroup autoCommand(){
+    autoShootBall = new AutoShootBall(m_shooter, m_index);
+    moveFromTarmac = new MoveFromTarmac(m_DriveTrain);
+    deployIntake = new DeployIntake(m_deployer);
+
+    return new SequentialCommandGroup(moveFromTarmac, deployIntake, autoShootBall);
 
   }
 
 
   public void testTeleOp(){
 
-    m_TankDrive = new TankDrive(m_DriveTrain,
-    () -> getLeftYAdjusted(),
-    () -> getRightYAdjusted());
+    getArcadeDrive().schedule();
 
     runIntake = new RunIntake(m_intake);
     runDeployer = new RunDeployer(m_deployer);
+
+    deployIntake = new DeployIntake(m_deployer);
+    retractIntake = new RetractIntake(m_deployer);
     
     runIndex = new RunIndex(m_index);
     runShooter = new RunShooter(m_shooter);
 
-    toggle.whenHeld(runShooter);
-    green.toggleWhenPressed(runIntake);
-    black.whenHeld(runDeployer);
-    red.toggleWhenPressed(runIndex);
+    primeShooter = new PrimeShooter(m_shooter, m_index);
+    fireBall = new FireBall(m_index);
+    initIndexing = new InitIndexing(m_index);
 
+    runIndexBackwards = new RunIndexBackwards(m_index, m_shooter);
+
+    lowGoal = new LowGoal(m_shooter);
+    highGoal = new HighGoal(m_shooter);
+
+    toggle.whenHeld(highGoal).whenReleased(lowGoal);
+
+    //toggle.cancelWhenPressed(runIndex).whenHeld(primeShooter);
+
+    green.cancelWhenPressed(runIndex).toggleWhenPressed(primeShooter);
+
+    black.whileHeld(fireBall);
+
+    Rtrigger.cancelWhenPressed(primeShooter).whenHeld(runIntake).whenHeld(runIndex);
     
-    m_TankDrive.schedule();
+    blue.whenPressed(deployIntake);
+    yellow.whenPressed(retractIntake);
 
+    red.whenHeld(runIndexBackwards);
 
     
 
@@ -192,6 +242,10 @@ public class RobotContainer {
     return -getRightY()*getSensitvity();
   }
 
+
+  public double getRightXAdjusted(){
+    return getRightX()*getSensitvity();
+  }
 
   public double getLeftY(){
     double val = m_leftJoystick.getY();
