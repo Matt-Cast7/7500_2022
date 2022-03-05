@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
 
    camera.init();
    camera.start();
-   
+
     
   }
 
@@ -85,6 +85,8 @@ public class Robot extends TimedRobot {
    //m_robotContainer.runDeployer();
 
   m_robotContainer.testTeleOp();
+
+
   }
 
   

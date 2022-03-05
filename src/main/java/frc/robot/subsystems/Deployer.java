@@ -10,9 +10,11 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,8 +26,12 @@ public class Deployer extends SubsystemBase {
 
     private ArmFeedforward feedforward = new ArmFeedforward(0.2 * 12, 0, 0, 0);
     private DigitalInput intakeLimitSwitch = new DigitalInput(Constants.DeployerLimitSwitch);
-    private final Encoder encoder = new Encoder(Constants.DeployerEncoder[0], Constants.DeployerEncoder[1]);
-    //private RelativeEncoder encoder;// = deployer.getEncoder();
+private final Encoder encoder = new Encoder(1, 2, false, EncodingType.k4X);
+  
+
+    
+   
+   //`private RelativeEncoder encoder;// = deployer.getEncoder();
 
     private BooleanSupplier deployState;
     private boolean flipDeployer = false;
@@ -56,15 +62,18 @@ public class Deployer extends SubsystemBase {
 
         // intakeAngle = (deployState.getAsBoolean()) ? deployedAngle : retractedAngle;
 
-        //encoder.reset();
+        
+        encoder.reset();
+        
         Shuffleboard.getTab("TeleOp").addNumber("Deployer Amps", () -> deployer.getOutputCurrent());
         //encoder = deployer.getAlternateEncoder(8192);
+        
         
     }
 
     public void periodic(){
         //System.out.println(encoder.getPosition() + zero);
-        //System.out.println(encoder.get());
+       // System.out.println(encoder.get());
     }
 
     public void setDeployerSpeed(double speed) {
@@ -73,6 +82,15 @@ public class Deployer extends SubsystemBase {
 
     public void stopDeployer() {
         setDeployerSpeed(0);
+    }
+
+
+    public void toggle(){
+        if(intakeLimitSwitch.get()){
+            retractIntake();
+        }else{
+            deployIntake();
+        }
     }
 
     public void deployIntake() {
@@ -110,8 +128,8 @@ public class Deployer extends SubsystemBase {
 
             Timer time = new Timer();
             time.start();
-            while(time.get() < 3){
-                setDeployerSpeed(-0.18);
+            while(time.get() < 1){
+                setDeployerSpeed(-0.3);
             }
             stopDeployer();
             time.stop();

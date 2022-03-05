@@ -11,16 +11,20 @@ public class InitIndexing extends CommandBase {
         this.m_index = m_index;
     }
 
-    public void enable() {
+    public void initialize(){
         m_index.initFiring();
     }
 
-    public boolean isFinihsed(){
-        return true;
+    public void execute() {
+    }
+
+    public boolean isFinished(){
+        return m_index.isFinihsedIniting();
     }
 
     public void end(boolean interrupted){
         m_index.stop();
+        m_index.finishedInitingIndex();
     }
 
 }

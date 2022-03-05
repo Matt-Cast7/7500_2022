@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import java.util.concurrent.CountDownLatch;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Shooter;
@@ -15,12 +17,12 @@ public class PrimeShooter extends CommandBase{
 
     }
     public void initialize(){
-        //m_index.initFiring();
+        
     }
 
     
     public void execute(){
-        m_shooter.enable();
+        m_shooter.enablePID();
     }
 
 

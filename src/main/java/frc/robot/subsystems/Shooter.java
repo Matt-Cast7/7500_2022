@@ -6,8 +6,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,16 +24,14 @@ public class Shooter extends SubsystemBase{
 
     
 
-
     // private NetworkTableEntry shooterSpeed = Shuffleboard.getTab("TeleOp")
     //     .addPersistent("Shooter Speed", 0)
     //     .withWidget(BuiltInWidgets.kNumberSlider)
     //     .withProperties(Map.of("min", -1, "max", 1))
     //     .getEntry();
 
-    private PIDController pid = new PIDController(0, 0, 0);
-
-
+    private PIDController pid = new PIDController(0.0000001, 0.0003, 0);
+    private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.02, 0.01);
 
     private boolean flipShooter = true;
 
@@ -48,12 +49,13 @@ public class Shooter extends SubsystemBase{
     
 
 
-    private double targetSpeed = 4100;
+    private double targetSpeed = 4500;
 
     private static double shooterSpeed = 0.75;
 
     private static boolean targetGoal = true; 
 
+    
     
     public Shooter(){
         
@@ -71,10 +73,10 @@ public class Shooter extends SubsystemBase{
             .addBoolean("Shooter Ready to Fire", () -> isShooterUptoSpeed());
 
         
-
-        Shuffleboard.getTab("TeleOp")
+            Shuffleboard.getTab("TeleOp")
             .addBoolean("High or Low Goal", () -> getTargetGoal());
-
+            
+            Shuffleboard.getTab("TeleOp").addNumber("Motor Power", () -> shooterMaster.get());
 
     }
 
@@ -90,10 +92,23 @@ public class Shooter extends SubsystemBase{
         // shooterMaster.set(shooterSpeed.getDouble(0));
         // shooterSlave.set(shooterSpeed.getDouble(0));
 
+
         shooterMaster.set(shooterSpeed);
         shooterSlave.set(shooterSpeed);
 
         
+    }
+
+    public void resetPID(){
+        pid.reset();
+    }
+
+    public void enablePID(){
+        //double power = MathUtil.clamp((pid.calculate(wheelSpeed.getDouble(0) + feedforward.calculate(targetSpeed), targetSpeed)), -1, 1);
+        double power = MathUtil.clamp((pid.calculate(Math.abs(wheelSpeed.getDouble(0)), targetSpeed)), -1, 1);
+        
+        shooterMaster.set(power);
+        shooterSlave.set(power);
     }
 
     public void stop(){
@@ -119,12 +134,14 @@ public class Shooter extends SubsystemBase{
     }
 
     public void setHighGoal(){
-        shooterSpeed = 0.67;
+        //shooterSpeed = 0.67;
+        targetSpeed = 4500;
         targetGoal = true;
     }
 
     public void setLowGoal(){
-        shooterSpeed = 0.45;
+        //shooterSpeed = 0.45;
+        targetSpeed = 2100;
         targetGoal = false;
     }
 
@@ -136,4 +153,7 @@ public class Shooter extends SubsystemBase{
         setShooterSpeed(0.1);
     }
     
+    public double getAngularVelocity(){
+        return ((2*Math.PI)/60)*wheelSpeed.getDouble(0);
+    }
 }

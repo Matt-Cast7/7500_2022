@@ -15,10 +15,11 @@ public class RunShooter extends CommandBase{
         
         
         //m_shooter.setShooterSpeed(0.1);
+        m_shooter.resetPID();
     }
 
     public void execute(){
-        m_shooter.enable();
+        m_shooter.enablePID();
     }
 
 

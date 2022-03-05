@@ -1,9 +1,12 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.BooleanSupplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -12,11 +15,13 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -27,7 +32,10 @@ public class Index extends SubsystemBase {
 
     private final I2C.Port i2c;// = I2C.Port.kOnboard;
 
-    private final ColorSensorV3 colorSensor;// = new ColorSensorV3(i2c);
+    private final I2C.Port i2c2;// = I2C.Port.kOnboard;
+
+    private final ColorSensorV3 frontIndexColorSensor;// = new ColorSensorV3(i2c);
+    private final ColorSensorV3 backIndexColorSensor;// = new ColorSensorV3(i2c);
 
     private final AnalogPotentiometer ultraSonic = new AnalogPotentiometer(Constants.uSensor);
 
@@ -41,13 +49,33 @@ public class Index extends SubsystemBase {
 
     private int uDistance = 1000;
 
+    private final Color blueBall = new Color(0.136, 0.288, 0.218);
+    private final Color redBall = new Color(0.266, 0.286, 0.139);
+    private final Color greenBall = new Color(0.501, 0.1040, 0.260);
+
+
+    private final ColorMatch colorMatcher = new ColorMatch();
+
+    private final Ball AllianceColor;
+
     // NetworkTableEntry indexSpeed = Shuffleboard.getTab("TeleOp")
     // .addPersistent("Index Speed", 0)
     // .withWidget(BuiltInWidgets.kNumberSlider)
     // .withProperties(Map.of("min", -1, "max", 1))
     // .getEntry();
 
+    public enum Ball {
+        RED,
+        BLUE,
+        GREEN,
+        NONE
+    }
+
     public Index() {
+
+        colorMatcher.addColorMatch(blueBall);
+        colorMatcher.addColorMatch(redBall);
+        colorMatcher.addColorMatch(greenBall);
 
         leftMotor.setInverted(!flipIndexMotors);
         rightMotor.setInverted(flipIndexMotors);
@@ -56,10 +84,18 @@ public class Index extends SubsystemBase {
         rightMotor.setIdleMode(IdleMode.kBrake);
 
         i2c = I2C.Port.kOnboard;
-        colorSensor = new ColorSensorV3(i2c);
+        frontIndexColorSensor = new ColorSensorV3(i2c);
+
+        i2c2 = I2C.Port.kMXP;
+
+        backIndexColorSensor = new ColorSensorV3(i2c2);
+
+        //AllianceColor = (DriverStation.getAlliance() == DriverStation.Alliance.Red) ? Ball.RED : Ball.BLUE;
+
+        AllianceColor = Ball.RED;
 
         isIntaking = () -> {
-            if (colorSensor.getProximity() > uDistance) {
+            if (frontIndexColorSensor.getProximity() > uDistance) {
                 return true;
             } else {
                 return false;
@@ -103,6 +139,52 @@ public class Index extends SubsystemBase {
     public void enableIndex() {
         // setIndex(indexSpeed.getDouble(0));
         setIndex(0.25);
+
+
+    }
+
+    public void TTenableIndex(){
+        if(!(detectFrontIndexBalls() == Ball.NONE)){
+
+            if(detectFrontIndexBalls() == AllianceColor){
+                if(detectBackIndexBalls() == Ball.NONE){
+                    while(detectBackIndexBalls() == Ball.NONE){
+                        setIndex(0.25);
+                    }
+                    setIndex(0);
+
+
+                }else{
+                    while(detectFrontIndexBalls() != Ball.NONE){
+                        setIndex(0.25);
+                    }
+                    setIndex(0);
+
+                }
+            }else{
+
+            }
+
+        }
+    }
+
+
+    public void indexBall(){
+
+        if(detectBackIndexBalls() == Ball.NONE){
+
+        }else{
+
+        }
+
+    }
+
+    public void spitBallBack(){
+
+    }
+
+    public void spitBallFront(){
+
     }
 
     public boolean indexOn() {
@@ -112,52 +194,81 @@ public class Index extends SubsystemBase {
             return false;
     }
 
-    public void indexBall() {
-        if (getDistanceCentimeters() < 40) {
-            while (isIntaking.getAsBoolean()) {
-                setIndex(0.10);
-            }
-            stop();
-        } else {
-            while (getDistanceCentimeters() > 40) {
-                setIndex(0.1);
-            }
-            stop();
-        }
-    }
+
+    boolean initingState = false;
 
     public void initFiring() {
 
-        Timer timer = new Timer();
-        timer.start();
-        while (timer.get() < 0.25) {
-            setIndex(-0.15);
-        }
+        new Thread(() -> {
+        Timer time = new Timer();
+        time.start();
+        setIndex(0.25);
+        System.out.println("Init Firing");
+        while(time.get() < 0.5){
+            System.out.println("Init Firing");
 
-        timer.stop();
-        timer = null;
+        }
         stop();
 
-    }
+        setIndex(-0.15);
+        while(frontIndexColorSensor.getProximity() < 65){
+
+        }
+
+        stop();
+        time.stop();
+        initingState = true;
+        }
+         ).start();
+
+        }
+
+        public void finishedInitingIndex(){
+            initingState = false;
+        }
+
+        public boolean isFinihsedIniting(){
+            return initingState;
+        }
+
+    boolean firedBalls = false;
 
     public void fireBall() {
+        
+        new Thread(() -> {
+        setIndex(0.5);
+        while(!shooterEntry.get()){
 
-        Timer timer = new Timer();
-        timer.start();
-        while (timer.get() < 2) {
-            //setIndex(0.5);
         }
-        while (timer.get() < 3) {
-            setIndex(0.5);
-        }
-
-        timer.stop();
-        timer = null;
         stop();
+        Timer time = new Timer();
+        time.start();
+        while(time.get() < 0.5){
+
+        }
+
+        setIndex(0.5);
+        while(!shooterEntry.get()){
+
+        }
+        stop();
+        firedBalls = true;
+    }).start();
 
     }
 
-    public void runBackwards(){
+    public void finishedFiring(){
+        firedBalls = false;
+    }
+
+    public boolean isFiredBalls(){
+        return firedBalls;
+    }
+
+
+    
+
+    public void runBackwards() {
         setIndex(-0.25);
     }
 
@@ -168,8 +279,52 @@ public class Index extends SubsystemBase {
     @Override
     public void periodic() {
         // System.out.println(((double)(((int)(getDistanceCentimeters()*10000))))/10000);
+        // System.out.println(ultraSonic.get());
         // System.out.println(colorSensor.getProximity());
         // System.out.println(colorSensor.getGreen());
+        // System.out.println("Blue " + frontIndexColorSensor.getBlue() + ": Red " +
+        //  frontIndexColorSensor.getRed()+": Green " + frontIndexColorSensor.getGreen() + " : " +
+        // frontIndexColorSensor.getProximity());
+        //System.out.println(detectFrontIndexBalls().toString() + " : " + detectBackIndexBalls());
+
+    }
+
+    public Ball detectBackIndexBalls() {
+        ColorMatchResult match = colorMatcher.matchClosestColor(backIndexColorSensor.getColor());
+
+        if (backIndexColorSensor.getProximity() > 340) {
+            if (match.color == blueBall) {
+                //System.out.println("Blue Ball : " + backIndexColorSensor.getProximity());
+                return Ball.BLUE;
+            } else if (match.color == redBall) {
+               // System.out.println("Red Ball : " + backIndexColorSensor.getProximity());
+                return Ball.RED;
+            }else if(match.color == greenBall){
+                return Ball.GREEN;
+            }
+        }
+       // System.out.println("Nothing");
+        return Ball.NONE;
+    }
+
+    public Ball detectFrontIndexBalls() {
+        ColorMatchResult match = colorMatcher.matchClosestColor(frontIndexColorSensor.getColor());
+
+        if (frontIndexColorSensor.getProximity() > 75) {
+            if (match.color == blueBall) {
+                //System.out.println("Blue Ball : " + frontIndexColorSensor.getProximity());
+                return Ball.BLUE;
+            } else if (match.color == redBall) {
+               // System.out.println("Red Ball : " + frontIndexColorSensor.getProximity());
+
+                return Ball.RED;
+            }else if(match.color == greenBall){
+                return Ball.GREEN;
+            }
+        }
+      //  System.out.println("Nothing");
+        return Ball.NONE;
+
     }
 
 }
